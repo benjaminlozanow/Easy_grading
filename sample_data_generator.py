@@ -1,6 +1,5 @@
 import pandas as pd
 import random
-import csv
 
 ## Generate columns for score dataframe
 
@@ -46,5 +45,4 @@ cols = ['Student', 'Score Random', 'Score Normal', 'Score Gamma']
 score_dataframe = score_dataframe[cols]
 
 # Export dataframe as a csv file
-
 score_dataframe.to_csv("sample_score_data.csv", index = False)
