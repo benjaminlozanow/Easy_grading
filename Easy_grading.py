@@ -11,12 +11,14 @@ score_df = pd.read_csv(second_argument)
 def user_input(colname):
     column_use = input("Do you want to calculate grades for " + colname + "? (y/n)")
     if column_use.lower() == 'y' or column_use.lower() == 'yes':
-        max_score = input("What is the maximum score for this test?")
-        percentage = input("What is the minimum score percentage (just the number) for approval? (60% or 50% are commonly used)")
-        return max_score
-        return percentage
+        max_score = int(input("What is the maximum score for this test?"))
+        percentage = int(input("What is the minimum score percentage (just the number) for approval? (60% or 50% are commonly used)"))
     else:
         print("Let's skip the column then")
+        max_score = 0
+        percentage = 0
+    return max_score, percentage
+
 
 # Function that calculates the grade for each score
 def grade_calculator(score, max_score, percentage):
@@ -25,13 +27,18 @@ def grade_calculator(score, max_score, percentage):
     approval_grade = 4.0
     e = percentage/100
     if score < e * max_score:
-        grade = (approval_grade - min_grade) * score / e * max_score + min_grade
+        grade = (approval_grade - min_grade) * (score / (e * max_score)) + min_grade
     elif score >= e * max_score:
-        grade = (max_grade - approval_grade) * score - e * max_score / max_score * (1 - e) + approval_grade
+        grade = (max_grade - approval_grade) * ((score - e * max_score) / (max_score * (1 - e))) + approval_grade
     else:
         print("Something went wrong, try again")
+    return (round(grade,2))
 
-
+# Iterates through the desired columns with user_input() and apply grade_calculator()
 for i in range(1,len(score_df.columns)):
-    user_input(score_df.columns[i])
-    
+    max_score, percentage = user_input(score_df.columns[i])
+    if not (max_score == 0) and not (percentage == 0):
+        score_df['Grade of ' + score_df.columns[i]] = score_df[score_df.columns[i]].apply(grade_calculator, args = (max_score, percentage))
+
+# Saves grades to a csv file
+score_df.to_csv("sample_grades_output_data.csv", index = False)
